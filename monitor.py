@@ -60,5 +60,6 @@ while True:
     mylcd.lcd_clear()
     for i in range(duration):
             mylcd.lcd_display_string("IP: " + get_ip(), 1)
+            mylcd.lcd_display_string("Host: " + socket.gethostname(), 2)
             time.sleep(wait)
     mylcd.lcd_clear()
