@@ -1,9 +1,10 @@
 import I2C_LCD_driver
 import time
+import socket
 import psutil
 
 mylcd = I2C_LCD_driver.lcd()
-duration = 4
+duration = 2
 wait = 1
 mylcd.lcd_clear()
 
@@ -21,36 +22,43 @@ def get_cpu_speed(): # get the CPU speed
 def get_cpu_load(): # use psutil to get the current load
     cpu_load = "%s" %psutil.cpu_percent()
     return cpu_load
+import socket
+
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
 while True:
-    counter = 0
     mylcd.lcd_clear()
-    while counter < duration:
+    for i in range(duration):
         mylcd.lcd_display_string("CPU Speed: ", 1)
         mylcd.lcd_display_string(get_cpu_speed() + " ", 2)
         time.sleep(wait)
-        counter += 1
-    counter = 0
     mylcd.lcd_clear()
-    while counter < duration:
+    for i in range(duration):
         mylcd.lcd_display_string("CPU Load:", 1)
         mylcd.lcd_display_string(get_cpu_load() + " % ",2)
         time.sleep(wait)
-        counter += 1
-    counter = 0
     mylcd.lcd_clear()
-    while counter < duration:
+    for i in range(duration):
         mylcd.lcd_display_string("CPU Temp: ", 1)
         mylcd.lcd_display_string(get_cpu_temp(), 2)
         time.sleep(wait)
-        counter += 1
-    counter = 0
     mylcd.lcd_clear()
-    while counter < duration:
+    for i in range(duration):
         mylcd.lcd_display_string("Time: %s" %time.strftime("%H:%M:%S"), 1)
         mylcd.lcd_display_string("Date: %s" %time.strftime("%d/%m/%Y"), 2)
         time.sleep(wait)
-        counter += 1
-    counter = 0
     mylcd.lcd_clear()
-
+    for i in range(duration):
+            mylcd.lcd_display_string("IP: " + get_ip(), 1)
+            time.sleep(wait)
+    mylcd.lcd_clear()
