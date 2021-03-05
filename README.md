@@ -1,5 +1,5 @@
-# python.raspberrypi
+# python.raspberrypi_lcd
 
-Just some stuff I'm playing around with whilst learning Python on the Pi.
+Collection of basic code to dispaly various info on an LCD connected to a Raspberry Pi
 
 Code will undoubtedly be messy and full of bad practices.
