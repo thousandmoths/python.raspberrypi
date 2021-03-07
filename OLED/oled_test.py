@@ -128,7 +128,18 @@ def clear_display():
     # Draw a smaller inner rectangle
     draw.rectangle((BORDER, BORDER, oled.width - BORDER - 1, oled.height - BORDER - 1), outline=0, fill=0)
 
-while True:
-    display_cpu_temp()
-    display_cpu_speed()
-    display_ip_address()
+print("Running - press CTRL-C to quit")
+
+try:
+    while True:
+        display_cpu_temp()
+        display_cpu_speed()
+        display_ip_address()
+
+except KeyboardInterrupt:
+    draw.rectangle((0, 0, oled.width, oled.height), outline=255, fill=255)
+    draw.rectangle((0, 0, oled.width, oled.height), outline=0, fill=0)
+    oled.image(image)
+    oled.show()
+
+print("Bye..........")
