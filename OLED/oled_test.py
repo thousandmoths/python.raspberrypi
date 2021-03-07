@@ -26,9 +26,9 @@ i2c = busio.I2C(SCL, SDA)
 oled = adafruit_ssd1306.SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=0x3c)
 
 # Load fonts.
-title_font = ImageFont.truetype("CONSOLA.TTF", 12)
-font = ImageFont.truetype("CONSOLA.TTF", 20)
-small_font = ImageFont.truetype("CONSOLA.TTF", 16)
+title_font = ImageFont.truetype("Ubuntu-Bold.ttf", 17)
+font = ImageFont.truetype("Ubuntu-Bold.ttf", 20)
+small_font = ImageFont.truetype("Ubuntu-Medium.ttf", 18)
 
 # Define an image using 1-bit color
 image = Image.new('1', (oled.width, oled.height))
@@ -114,7 +114,7 @@ def display_ip_address():
             ip, font=small_font, fill=255)
         host_name = (socket.gethostname())
         (font_width, font_height) = font.getsize(host_name)
-        draw.text((oled.width//2 - font_width//2, 46), 
+        draw.text((oled.width//2 - font_width//2, 40), 
             host_name, font=small_font, fill=255)
         # Display image
         oled.image(image)
