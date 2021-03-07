@@ -26,9 +26,9 @@ i2c = busio.I2C(SCL, SDA)
 oled = adafruit_ssd1306.SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=0x3c)
 
 # Load fonts.
-title_font = ImageFont.truetype("CascadiaMono.ttf", 12)
-font = ImageFont.truetype("CascadiaMono.ttf", 20)
-small_font = ImageFont.truetype("CascadiaMono.ttf", 16)
+title_font = ImageFont.truetype("CONSOLA.TTF", 12)
+font = ImageFont.truetype("CONSOLA.TTF", 20)
+small_font = ImageFont.truetype("CONSOLA.TTF", 16)
 
 # Define an image using 1-bit color
 image = Image.new('1', (oled.width, oled.height))
