@@ -1,16 +1,15 @@
+# Import Blinka
+from board import SCL, SDA
+import busio
+import adafruit_ssd1306
+# Import Python Imaging Library
+from PIL import Image, ImageDraw, ImageFont
 import json
 import subprocess
 import time
 import socket
 import psutil
 import requests
-# Import Blinka
-from board import SCL, SDA
-import busio
-import adafruit_ssd1306
-
-# Import Python Imaging Library
-from PIL import Image, ImageDraw, ImageFont
 
 WIDTH = 128
 HEIGHT = 64
@@ -30,10 +29,33 @@ title_font = ImageFont.truetype("Ubuntu-Bold.ttf", 17)
 font = ImageFont.truetype("Ubuntu-Bold.ttf", 20)
 small_font = ImageFont.truetype("Ubuntu-Medium.ttf", 18)
 
-# Define an image using 1-bit color
-image = Image.new('1', (oled.width, oled.height))
+# Create blank image for drawing.
+# Make sure to create image with mode '1' for 1-bit color.
+width = oled.width
+height = oled.height
+image = Image.new('1', (width, height))
+ 
 # Get drawing object to draw on image.
 draw = ImageDraw.Draw(image)
+ 
+# Draw a black filled box to clear the image.
+draw.rectangle((0, 0, width, height), outline=0, fill=0)
+ 
+# Draw some shapes.
+# First define some constants to allow easy resizing of shapes.
+padding = -2
+top = padding
+bottom = height - padding
+
+# Move left to right keeping track of the current x position
+# for drawing shapes.
+x = 0
+
+def clear_display():
+    # Draw a white background
+    draw.rectangle((0, 0, oled.width, oled.height), outline=255, fill=255)
+    # Draw a smaller inner rectangle
+    draw.rectangle((BORDER, BORDER, oled.width - BORDER - 1, oled.height - BORDER - 1), outline=0, fill=0)
 
 def get_cpu_temp():
     tmp = open('/sys/class/thermal/thermal_zone0/temp')
@@ -42,50 +64,11 @@ def get_cpu_temp():
     cpu_temp = '{:.2f}'.format( float(cpu)/1000 ) + "° C"
     return cpu_temp
 
-def display_cpu_temp():
-    clear_display()
-    for i in range(DURATION):
-        title = "CPU TEMP"
-        (font_width, font_height) = font.getsize(title)
-        draw.text(((oled.width//2 - font_width//2), 0), 
-        title, font=title_font, fill=255)
-        # Clear the dynamic part of the display
-        draw.rectangle((0, 16, oled.width, oled.height), outline=0, fill=0)
-        text = get_cpu_temp()
-        (font_width, font_height) = font.getsize(text)
-        draw.text((oled.width//2 - font_width//2, oled.height//2 - font_height//2), 
-            text, font=font, fill=255)
-        # Display image
-        oled.image(image)
-        oled.show()
-        time.sleep(1)
-    return
-
 def get_cpu_speed(): # get the CPU speed 
     tmp1 = open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
     freq = tmp1.read
     cpu_speed = ('%u MHz' % (int(freq()) / 1000))
     return cpu_speed
-
-def display_cpu_speed():
-    clear_display()
-    for i in range(DURATION):
-        title = "CPU SPEED"
-        (font_width, font_height) = font.getsize(title)
-        draw.text(((oled.width//2 - font_width//2), 0), 
-        title, font=title_font, fill=255)
-        # Clear the dynamic part of the display 
-        draw.rectangle((0, 16, oled.width, oled.height), outline=0, fill=0)
-        # Define the content to be displayed
-        text = get_cpu_speed()
-        (font_width, font_height) = font.getsize(text)
-        draw.text((oled.width//2 - font_width//2, oled.height//2 - font_height//2), 
-            text, font=font, fill=255)
-        # Draw the display
-        oled.image(image)
-        oled.show()
-        time.sleep(1)
-    return
 
 def get_ip_address():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -104,13 +87,13 @@ def display_ip_address():
     for i in range(DURATION):
         title = "IP"
         (font_width, font_height) = font.getsize(title)
-        draw.text(((oled.width//2 - font_width//2), 0), 
+        draw.text(((oled.width//2 - font_width//2), x), 
         title, font=title_font, fill=255)
         # Clear the dynamic part of the display
         draw.rectangle((0, 16, oled.width, oled.height), outline=0, fill=0)
         ip = get_ip_address()
         (font_width, font_height) = font.getsize(ip)
-        draw.text((5, oled.height//2 - font_height//2), 
+        draw.text((oled.width//2 - font_width//2, oled.height//2 - font_height//2), 
             ip, font=small_font, fill=255)
         host_name = (socket.gethostname())
         (font_width, font_height) = font.getsize(host_name)
@@ -122,11 +105,44 @@ def display_ip_address():
         time.sleep(1)
     return
 
-def clear_display():
-    # Draw a white background
-    draw.rectangle((0, 0, oled.width, oled.height), outline=255, fill=255)
-    # Draw a smaller inner rectangle
-    draw.rectangle((BORDER, BORDER, oled.width - BORDER - 1, oled.height - BORDER - 1), outline=0, fill=0)
+def display_cpu_speed():
+    clear_display()
+    for i in range(DURATION):
+        title = "CPU SPEED"
+        (font_width, font_height) = font.getsize(title)
+        draw.text(((oled.width//2 - font_width//2), x), 
+        title, font=title_font, fill=255)
+        # Clear the dynamic part of the display 
+        draw.rectangle((0, 16, oled.width, oled.height), outline=0, fill=0)
+        # Define the content to be displayed
+        text = get_cpu_speed()
+        (font_width, font_height) = font.getsize(text)
+        draw.text((oled.width//2 - font_width//2, oled.height//2 - font_height//2), 
+            text, font=font, fill=255)
+        # Draw the display
+        oled.image(image)
+        oled.show()
+        time.sleep(1)
+    return
+
+def display_cpu_temp():
+    clear_display()
+    for i in range(DURATION):
+        title = "CPU TEMP"
+        (font_width, font_height) = font.getsize(title)
+        draw.text(((oled.width//2 - font_width//2), x), 
+        title, font=title_font, fill=255)
+        # Clear the dynamic part of the display
+        draw.rectangle((0, 16, oled.width, oled.height), outline=0, fill=0)
+        text = get_cpu_temp()
+        (font_width, font_height) = font.getsize(text)
+        draw.text((oled.width//2 - font_width//2, oled.height//2 - font_height//2), 
+            text, font=font, fill=255)
+        # Display image
+        oled.image(image)
+        oled.show()
+        time.sleep(1)
+    return
 
 print("Running - press CTRL-C to quit")
 
